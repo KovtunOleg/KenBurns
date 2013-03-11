@@ -1,6 +1,6 @@
 //
 //  MovieMaker.h
-//  KenBern
+//  KenBurns
 //
 //  Created by Oleg Kovtun on 06.03.13.
 //  Copyright (c) 2013 Oleg Kovtun. All rights reserved.
@@ -16,5 +16,5 @@ typedef void(^onVideoCreatedBlock)(NSString* path, BOOL isOK);
 @property (nonatomic,unsafe_unretained) NSArray* imageArray; // array of CGImages
 @property (nonatomic,assign) CGSize frameSize;
 @property (nonatomic,assign) CGFloat duration;
-- (void) startRecordingKenBernsMovieWithCompletionBlock:(onVideoCreatedBlock)block;
+- (void) startRecordingKenBurnsMovieWithCompletionBlock:(onVideoCreatedBlock)block;
 @end

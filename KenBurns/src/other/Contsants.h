@@ -1,6 +1,6 @@
 //
 //  Contsants.h
-//  KenBern
+//  KenBurns
 //
 //  Created by Oleg Kovtun on 06.03.13.
 //  Copyright (c) 2013 Oleg Kovtun. All rights reserved.

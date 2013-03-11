@@ -1,6 +1,6 @@
 //
 //  MovieMaker.m
-//  KenBern
+//  KenBurns
 //
 //  Created by Oleg Kovtun on 06.03.13.
 //  Copyright (c) 2013 Oleg Kovtun. All rights reserved.
@@ -33,12 +33,12 @@
 
 #pragma mark - Movie creation methods
 
-- (void) startRecordingKenBernsMovieWithCompletionBlock:(onVideoCreatedBlock)block {
-    [self createKenBernsMovie];
+- (void) startRecordingKenBurnsMovieWithCompletionBlock:(onVideoCreatedBlock)block {
+    [self createKenBurnsMovie];
     [self exportMovieWithCompletionBlock:block];
 }
 
-- (void) createKenBernsMovie {
+- (void) createKenBurnsMovie {
     CMTimeRange videoRange =  CMTimeRangeMake(kCMTimeZero, CMTimeMake(self.duration, 1));
     CALayer *aLayer = [self buildKenBurnsLayer];
     
@@ -73,7 +73,7 @@
         [[NSFileManager defaultManager] removeItemAtPath:fileName error:nil];
     }
     
-    __block AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:self.cmp presetName:AVAssetExportPresetHighestQuality];
+    __block AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:self.cmp presetName:AVAssetExportPreset640x480];
     exporter.outputURL = [NSURL fileURLWithPath:fileName];
     exporter.videoComposition = self.animComp;
     exporter.outputFileType = AVFileTypeQuickTimeMovie;
@@ -94,12 +94,12 @@
     imageLayer.bounds      = (CGRect){CGPointZero,self.frameSize};
     imageLayer.contentsGravity = kCAGravityResizeAspect;
     
-    [imageLayer addAnimation:[self kenBernsAnimation] forKey:@"KenBerns"];
+    [imageLayer addAnimation:[self KenBurnsAnimation] forKey:@"KenBurns"];
     
     return imageLayer;
 }
 
-- (CAAnimationGroup*) kenBernsAnimation {
+- (CAAnimationGroup*) KenBurnsAnimation {
     
     CAKeyframeAnimation *anim = [CAKeyframeAnimation animationWithKeyPath:@"contents"];
     anim.values = self.imageArray;

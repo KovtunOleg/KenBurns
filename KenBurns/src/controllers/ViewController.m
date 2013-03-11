@@ -1,6 +1,6 @@
 //
 //  ViewController.m
-//  KenBern
+//  KenBurns
 //
 //  Created by Oleg Kovtun on 06.03.13.
 //  Copyright (c) 2013 Oleg Kovtun. All rights reserved.
@@ -73,7 +73,7 @@
     [self.mMaker setImageArray:imagesForVideo];
     [self.mMaker setFrameSize:CGSizeMake(1920, 1080)];
     [self.mMaker setDuration:25];
-    [self.mMaker startRecordingKenBernsMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {
+    [self.mMaker startRecordingKenBurnsMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {
         if ( isOK ) {
             NSLog(@"Succcess!");
             [safePointer playVideo:path];
