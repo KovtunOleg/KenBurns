@@ -62,7 +62,6 @@
     AVMutableVideoCompositionInstruction *instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
     instruction.timeRange = videoRange;
     AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:trackA];
-    [layerInstruction setOpacity:1.0 atTime:kCMTimeZero];
     instruction.layerInstructions = @[layerInstruction];
     self.animComp.instructions = @[instruction];
 }
@@ -73,7 +72,7 @@
         [[NSFileManager defaultManager] removeItemAtPath:fileName error:nil];
     }
     
-    __block AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:self.cmp presetName:AVAssetExportPreset640x480];
+    __block AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:self.cmp presetName:AVAssetExportPresetHighestQuality];
     exporter.outputURL = [NSURL fileURLWithPath:fileName];
     exporter.videoComposition = self.animComp;
     exporter.outputFileType = AVFileTypeQuickTimeMovie;

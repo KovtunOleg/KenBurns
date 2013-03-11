@@ -89,8 +89,8 @@
 		6343A76B16EDFA6D0032CBE8 /* KenBurns */ = {
 			isa = PBXGroup;
 			children = (
-				6343A76C16EDFA6D0032CBE8 /* res */,
 				6343A77F16EDFA6D0032CBE8 /* src */,
+				6343A76C16EDFA6D0032CBE8 /* res */,
 			);
 			path = KenBurns;
 			sourceTree = "<group>";
@@ -142,12 +142,12 @@
 			isa = PBXGroup;
 			children = (
 				6343A78016EDFA6D0032CBE8 /* additions */,
-				6343A78116EDFA6D0032CBE8 /* AppDelegate.h */,
-				6343A78216EDFA6D0032CBE8 /* AppDelegate.m */,
 				6343A78316EDFA6D0032CBE8 /* controllers */,
 				6343A78616EDFA6D0032CBE8 /* models */,
 				6343A78916EDFA6D0032CBE8 /* other */,
 				6343A78E16EDFA6D0032CBE8 /* views */,
+				6343A78116EDFA6D0032CBE8 /* AppDelegate.h */,
+				6343A78216EDFA6D0032CBE8 /* AppDelegate.m */,
 			);
 			path = src;
 			sourceTree = "<group>";

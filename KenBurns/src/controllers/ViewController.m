@@ -43,8 +43,7 @@
 
 - (void) playVideo:(NSString*)path {
     [self.videoPlayer setContentURL:[NSURL fileURLWithPath:path]];
-    [self.videoPlayer prepareToPlay];
-    [self.activityView stopAnimating];
+    [self.videoPlayer play];
     UISaveVideoAtPathToSavedPhotosAlbum(path,self,@selector(video:didFinishSavingWithError:contextInfo:),nil);
 }
 
@@ -74,6 +73,7 @@
     [self.mMaker setFrameSize:CGSizeMake(1920, 1080)];
     [self.mMaker setDuration:25];
     [self.mMaker startRecordingKenBurnsMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {
+        [self.activityView stopAnimating];
         if ( isOK ) {
             NSLog(@"Succcess!");
             [safePointer playVideo:path];
