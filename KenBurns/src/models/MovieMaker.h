@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void(^onVideoCreatedBlock)(NSString* path, NSUInteger index, BOOL isOK);
+typedef void(^onVideoCreatedBlock)(NSString* path, BOOL isOK);
 
 @interface MovieMaker : NSObject {
     

@@ -8,12 +8,20 @@
 
 #import <Foundation/Foundation.h>
 
+#define kImage  @"image"
+#define kInfo   @"info"
+#define kPath   @"path"
+
 @interface VideoMap : NSObject {
     
 }
-+ (VideoMap*) instance;
-+ (void) updateWithVideoMap:(VideoMap*)videoMap;
+@property (nonatomic,strong,readonly) NSMutableArray* lastAddedMaps;
+@property (nonatomic,strong,readonly) NSMutableArray* lastRemovedMaps;
+@property (nonatomic,assign,readonly) BOOL hasChanges;
 
++ (VideoMap*) instance;
+
+- (void) updateWithVideoMap:(VideoMap*)videoMap;
 - (void) addMapWithImage:(UIImage*)image info:(NSString*)info;
 
 - (void) addPath:(NSString*)path atIndex:(NSUInteger)index;

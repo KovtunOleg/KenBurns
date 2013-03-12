@@ -22,6 +22,7 @@
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
+        self.title = @"Edit";
         self.tempVideoMap = [VideoMap instance];
         [self setupNavigationButtons];
         self.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
@@ -33,7 +34,7 @@
 #pragma mark - Actions
 
 - (void) doneButtonAction {
-    [VideoMap updateWithVideoMap:self.tempVideoMap];
+    [[VideoMap instance] updateWithVideoMap:self.tempVideoMap];
     
     if ( self.onDoneBlock ) {
         self.onDoneBlock();

@@ -34,24 +34,33 @@
 #pragma mark - Movie creation methods
 
 - (void) startRecordingKenBurnsMovieWithCompletionBlock:(onVideoCreatedBlock)block {
+    [self removeDeletedVideos];
     
-    NSArray* images = [[VideoMap instance] images];
-    self.imageCounter = [images count];
+    NSArray* lastAddedMaps = [[VideoMap instance] lastAddedMaps];
+    self.imageCounter = [lastAddedMaps count];
     
-    __unsafe_unretained MovieMaker* safePointer = self;
-    for (UIImage* image in images) {
-        [self createKenBurnsMovie:image];
-        [self exportMovieWithCompletionBlock:^(NSString *path, NSUInteger index, BOOL isOK) {
+    if ( self.imageCounter > 0 ) {
+        __unsafe_unretained MovieMaker* safePointer = self;
+        for ( NSMutableDictionary* map in lastAddedMaps ) {
             
-            safePointer.imageCounter--;
-            [[VideoMap instance] addPath:path atIndex:index];
-            if ( 0 == safePointer.imageCounter ) {
-                [safePointer mergeVideos];
-                [safePointer exportMovieWithCompletionBlock:block path:filePath(documentFolderPath(),RESULT_VIDEO,EXT_MP4) index:0];
-            }
-            
-            
-        } path:filePath(videoFolderPath(),image.description,EXT_MP4) index:[images indexOfObject:image]];
+            UIImage* image = map[kImage];
+            [self createKenBurnsMovie:image];
+            [self exportMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {
+                
+                safePointer.imageCounter--;
+                map[kPath] = path;
+                if ( 0 == safePointer.imageCounter ) {
+                    [safePointer mergeVideos];
+                    [safePointer exportMovieWithCompletionBlock:block path:filePath(documentFolderPath(),RESULT_VIDEO,EXT_MP4)];
+                }
+                
+                
+            } path:filePath(videoFolderPath(),image.description,EXT_MP4)];
+        }
+        
+    } else {
+        [self mergeVideos];
+        [self exportMovieWithCompletionBlock:block path:filePath(documentFolderPath(),RESULT_VIDEO,EXT_MP4)];
     }
 }
 
@@ -81,7 +90,7 @@
                        animationTool:[AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer]];
 }
 
--(void) exportMovieWithCompletionBlock:(onVideoCreatedBlock)block path:(NSString*)path index:(NSUInteger)index {
+-(void) exportMovieWithCompletionBlock:(onVideoCreatedBlock)block path:(NSString*)path {
     [self removeFile:path];
     
     __block AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:self.composition presetName:AVAssetExportPresetHighestQuality];
@@ -91,7 +100,7 @@
     [exporter exportAsynchronouslyWithCompletionHandler:^{
         if ( block ) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                block(path,index,exporter.status == AVAssetExportSessionStatusCompleted);
+                block(path,exporter.status == AVAssetExportSessionStatusCompleted);
             });
         }
     }];
@@ -131,6 +140,14 @@
 }
 
 #pragma mark - Directory manipulations
+
+- (void) removeDeletedVideos {
+    dispatch_async(backgroundQueue(), ^{
+        for ( NSMutableDictionary* map in [[VideoMap instance] lastRemovedMaps] ) {
+            [self removeFile:map[kPath]];
+        }
+    });
+}
 
 - (void) removeFile:(NSString*)path {
     if( [[NSFileManager defaultManager] fileExistsAtPath:path] ){

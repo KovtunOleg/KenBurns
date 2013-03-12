@@ -14,5 +14,7 @@
 #define TEMP_VIDEO                      @"temp"
 #define RESULT_VIDEO                    @"result"
 #define VIDEOS_FOLDER                   @"videos"
+#define MAPS                            @"maps"
 
 #define EXT_MP4                         @"mp4"
+#define EXT_PLIST                       @"plist"

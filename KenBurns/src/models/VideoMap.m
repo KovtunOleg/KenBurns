@@ -8,28 +8,64 @@
 
 #import "VideoMap.h"
 
-#define kImage  @"image"
-#define kInfo   @"info"
-#define kPath   @"path"
-
 @interface VideoMap () <NSCopying>
 @property (nonatomic,strong) NSMutableArray* maps;
 @end
 
 @implementation VideoMap
+@synthesize hasChanges = _hasChanges;
 
 VideoMap* gVideoMap = nil;
 + (VideoMap*) instance {
     if ( !gVideoMap ) {
         gVideoMap = [[VideoMap alloc] init];
+        
         gVideoMap.maps = [NSMutableArray array];
+        NSString* path = filePath(videoFolderPath(),MAPS,EXT_PLIST);
+        if( [[NSFileManager defaultManager] fileExistsAtPath:path] ){
+            NSData * data = [NSData dataWithContentsOfFile:path];
+            gVideoMap.maps = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        }
     }
     return gVideoMap;
 }
 
-+ (void) updateWithVideoMap:(VideoMap*)videoMap {
-    [[VideoMap instance] setMaps:[NSMutableArray arrayWithArray:videoMap.maps]];
+- (void) updateWithVideoMap:(VideoMap*)videoMap {
+    [self setMaps:[NSMutableArray arrayWithArray:videoMap.maps]];
+    
+    NSData * data = [NSKeyedArchiver archivedDataWithRootObject:videoMap.maps];
+    [data writeToFile:filePath(videoFolderPath(),MAPS,EXT_PLIST) atomically:YES];
 }
+
+#pragma mark - Accessors
+
+- (BOOL) hasChanges {
+    return self.lastRemovedMaps.count || self.lastAddedMaps.count;
+}
+
+- (void) setMaps:(NSMutableArray *)maps {
+    _hasChanges = ![maps isEqualToArray:_maps];
+    _lastAddedMaps = [NSMutableArray arrayWithArray:maps];
+    [_lastAddedMaps removeObjectsInArray:_maps];
+    _lastRemovedMaps = [NSMutableArray arrayWithArray:_maps];
+    [_lastRemovedMaps removeObjectsInArray:maps];
+    
+    _maps = maps;
+}
+
+- (NSArray*) images {
+    return [self objectsForKey:kImage];
+}
+
+- (NSArray*) paths {
+    return [self objectsForKey:kPath];
+}
+
+- (NSArray*) infos {
+    return [self objectsForKey:kInfo];
+}
+
+#pragma mark - Manipulation
 
 - (void) addMapWithImage:(UIImage*)image info:(NSString*)info {
     NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithObjects:@[image,info] forKeys:@[kImage,kInfo]];
@@ -55,17 +91,7 @@ VideoMap* gVideoMap = nil;
     }
 }
 
-- (NSArray*) images {
-    return [self objectsForKey:kImage];
-}
-
-- (NSArray*) paths {
-    return [self objectsForKey:kPath];
-}
-
-- (NSArray*) infos {
-    return [self objectsForKey:kInfo];
-}
+#pragma mark - Convenience
 
 - (BOOL) containsInfo:(NSString*)info {
     return [[self infos] containsObject:info];

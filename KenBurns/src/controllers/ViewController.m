@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "VideoMap.h"
 #import "ImageTableViewController.h"
 #import "MovieMaker.h"
 #import "MBProgressHUD.h"
@@ -24,8 +25,10 @@
 
 - (void) viewDidLoad {
     [super viewDidLoad];
-    [self setupEditButton];
+    self.title = @"Result Movie";
+    [self setupNavigationButtons];
     [self setupVideoPlayer];
+    [self setupMovieMaker];
     [self setupProgressHUD];
 }
 
@@ -45,25 +48,40 @@
 #pragma mark - Actions
 
 - (void) playVideo:(NSString*)path {
+    [self.videoPlayer.view setHidden:NO];
     [self.videoPlayer setContentURL:[NSURL fileURLWithPath:path]];
     [self.videoPlayer play];
-    UISaveVideoAtPathToSavedPhotosAlbum(path,self,@selector(video:didFinishSavingWithError:contextInfo:),nil);
 }
 
 - (void) editButtonAction {
     ImageTableViewController* imageTableVC = [[ImageTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
     imageTableVC.onDoneBlock = ^ {
-        [self createMovie];
+        if ( [[VideoMap instance] hasChanges] ) {
+            [self createMovie];
+        }
     };
     UINavigationController* navController = [[UINavigationController alloc] initWithRootViewController:imageTableVC];
     [self presentModalViewController:navController animated:YES];
 }
 
+- (void) saveButtonAction {
+    NSURL *url = self.videoPlayer.contentURL;
+    UISaveVideoAtPathToSavedPhotosAlbum(url.absoluteString,self,@selector(video:didFinishSavingWithError:contextInfo:),nil);
+}
+
 #pragma mark - Setups
 
-- (void) setupEditButton {
+- (void) setupMovieMaker {
+    self.mMaker = [[MovieMaker alloc] init];
+    [self.mMaker setFrameSize:CGSizeMake(640, 360)];
+    [self.mMaker setImageDuration:3];
+}
+
+- (void) setupNavigationButtons {
     UIBarButtonItem *editButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonAction)];
-    self.navigationItem.rightBarButtonItem = editButton;
+    self.navigationItem.leftBarButtonItem = editButton;
+    UIBarButtonItem *saveButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonAction)];
+    self.navigationItem.rightBarButtonItem = saveButton;
 }
 
 - (void) setupProgressHUD {
@@ -82,22 +100,26 @@
                                              UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
     [self.view addSubview:self.videoPlayer.view];
     [self.view sendSubviewToBack:self.videoPlayer.view];
+    [self.videoPlayer.view setHidden:YES];
+    
+    NSString* path = filePath(documentFolderPath(),RESULT_VIDEO,EXT_MP4);
+    if( [[NSFileManager defaultManager] fileExistsAtPath:path] ){
+        [self playVideo:path];
+    }
 }
 
 - (void) createMovie {
     [self.progressHUD show:YES];
+    [self.videoPlayer.view setHidden:YES];
     
     __unsafe_unretained ViewController* safePointer = self;
-    self.mMaker = [[MovieMaker alloc] init];
-    [self.mMaker setFrameSize:CGSizeMake(640, 360)];
-    [self.mMaker setImageDuration:3];
-    [self.mMaker startRecordingKenBurnsMovieWithCompletionBlock:^(NSString *path, NSUInteger index, BOOL isOK) {
+    [self.mMaker startRecordingKenBurnsMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {
         [self.progressHUD hide:YES];
-        if ( isOK ) {
-            NSLog(@"Succcess!");
-            [safePointer playVideo:path];
+
+        if ( !isOK ) {
+            [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
         } else {
-            NSLog(@"Fail!");
+            [safePointer playVideo:path];
         }
     }];
 }
