@@ -27,6 +27,7 @@
         self.frameSize = CGSizeMake(480, 320); // default video frame size
         self.imageDuration = 5; // default image duration
         self.videoMap = [NSMutableArray array];
+        [self createVideosFolder];
     }
     return self;
 }
@@ -46,11 +47,11 @@
             [safePointer.videoMap addObject:path];
             if ( 0 == safePointer.imageCounter ) {
                 [safePointer mergeVideos];
-                [safePointer exportMovieWithCompletionBlock:block fileName:RESULT_VIDEO];
+                [safePointer exportMovieWithCompletionBlock:block path:FILE_PATH(DOCUMENT_FOLDER_PATH,RESULT_VIDEO,EXT_MP4)];
             }
             
             
-        } fileName:image.description];
+        } path:FILE_PATH(VIDEO_FOLDER_PATH,image.description,EXT_MP4)];
     }
 }
 
@@ -80,8 +81,7 @@
                        animationTool:[AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer]];
 }
 
--(void) exportMovieWithCompletionBlock:(onVideoCreatedBlock)block fileName:(NSString*)fileName {
-    NSString *path = DOCUMENT_FILE_PATH(fileName,EXT_MP4);
+-(void) exportMovieWithCompletionBlock:(onVideoCreatedBlock)block path:(NSString*)path {
     [self removeFile:path];
     
     __block AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:self.composition presetName:AVAssetExportPresetHighestQuality];
@@ -100,6 +100,17 @@
 - (void) removeFile:(NSString*)path {
     if( [[NSFileManager defaultManager] fileExistsAtPath:path] ){
         [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+    }
+}
+
+- (void) createVideosFolder {
+    NSString* videosFolderPath = VIDEO_FOLDER_PATH;
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:videosFolderPath isDirectory:nil]) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:videosFolderPath
+                                       withIntermediateDirectories:YES
+                                                        attributes:nil
+                                                        error:nil];
     }
 }
 

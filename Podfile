@@ -1,4 +1,4 @@
-platform :ios, '4.3'
+platform :ios, '5.0'
 
 pod 'MBProgressHUD', :head
-pod 'ELCImagePickerController', :head
+pod 'ELCImagePickerController', :git => 'https://github.com/lawrencelomax/ELCImagePickerController.git'

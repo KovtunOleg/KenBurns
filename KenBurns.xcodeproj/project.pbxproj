@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		55BBF8F43CB64CD6977E0BD0 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D2F1D987512459DB5CFFECB /* libPods.a */; };
 		6343A78F16EDFA6D0032CBE8 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6343A76D16EDFA6D0032CBE8 /* Default-568h@2x.png */; };
 		6343A79016EDFA6D0032CBE8 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 6343A76E16EDFA6D0032CBE8 /* Default.png */; };
 		6343A79116EDFA6D0032CBE8 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6343A76F16EDFA6D0032CBE8 /* Default@2x.png */; };
@@ -32,9 +33,13 @@
 		6376263A16E77E2A00EEE6D4 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6376263916E77E2A00EEE6D4 /* MediaPlayer.framework */; };
 		6386026616E8A489009D8D21 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6386026516E8A489009D8D21 /* QuartzCore.framework */; };
 		63B2F53B16EF049F00753825 /* KenBurnsAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B2F53A16EF049F00753825 /* KenBurnsAnimation.m */; };
+		63B2F53D16EF1A8D00753825 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63B2F53C16EF1A8D00753825 /* AssetsLibrary.framework */; };
+		63B2F54016EF201900753825 /* ImageTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B2F53F16EF201900753825 /* ImageTableViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1BEFDA330F1940C49AE673C1 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
+		1D2F1D987512459DB5CFFECB /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6343A76D16EDFA6D0032CBE8 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		6343A76E16EDFA6D0032CBE8 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		6343A76F16EDFA6D0032CBE8 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
@@ -68,6 +73,9 @@
 		6386026516E8A489009D8D21 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		63B2F53916EF049F00753825 /* KenBurnsAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KenBurnsAnimation.h; sourceTree = "<group>"; };
 		63B2F53A16EF049F00753825 /* KenBurnsAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KenBurnsAnimation.m; sourceTree = "<group>"; };
+		63B2F53C16EF1A8D00753825 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
+		63B2F53E16EF201900753825 /* ImageTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageTableViewController.h; sourceTree = "<group>"; };
+		63B2F53F16EF201900753825 /* ImageTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageTableViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63B2F53D16EF1A8D00753825 /* AssetsLibrary.framework in Frameworks */,
 				6386026616E8A489009D8D21 /* QuartzCore.framework in Frameworks */,
 				6376263A16E77E2A00EEE6D4 /* MediaPlayer.framework in Frameworks */,
 				6376263116E76C1300EEE6D4 /* CoreMedia.framework in Frameworks */,
@@ -83,6 +92,7 @@
 				637625D516E762FC00EEE6D4 /* UIKit.framework in Frameworks */,
 				637625D716E762FC00EEE6D4 /* Foundation.framework in Frameworks */,
 				637625D916E762FC00EEE6D4 /* CoreGraphics.framework in Frameworks */,
+				55BBF8F43CB64CD6977E0BD0 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,6 +177,8 @@
 			children = (
 				6343A78416EDFA6D0032CBE8 /* ViewController.h */,
 				6343A78516EDFA6D0032CBE8 /* ViewController.m */,
+				63B2F53E16EF201900753825 /* ImageTableViewController.h */,
+				63B2F53F16EF201900753825 /* ImageTableViewController.m */,
 			);
 			path = controllers;
 			sourceTree = "<group>";
@@ -206,6 +218,7 @@
 				6343A76B16EDFA6D0032CBE8 /* KenBurns */,
 				637625D316E762FC00EEE6D4 /* Frameworks */,
 				637625D216E762FC00EEE6D4 /* Products */,
+				1BEFDA330F1940C49AE673C1 /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -220,6 +233,7 @@
 		637625D316E762FC00EEE6D4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				63B2F53C16EF1A8D00753825 /* AssetsLibrary.framework */,
 				6386026516E8A489009D8D21 /* QuartzCore.framework */,
 				6376263916E77E2A00EEE6D4 /* MediaPlayer.framework */,
 				6376263016E76C1300EEE6D4 /* CoreMedia.framework */,
@@ -228,6 +242,7 @@
 				637625D416E762FC00EEE6D4 /* UIKit.framework */,
 				637625D616E762FC00EEE6D4 /* Foundation.framework */,
 				637625D816E762FC00EEE6D4 /* CoreGraphics.framework */,
+				1D2F1D987512459DB5CFFECB /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -242,6 +257,7 @@
 				637625CD16E762FC00EEE6D4 /* Sources */,
 				637625CE16E762FC00EEE6D4 /* Frameworks */,
 				637625CF16E762FC00EEE6D4 /* Resources */,
+				2273BFFD1F9840CE87617FE1 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -300,6 +316,23 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2273BFFD1F9840CE87617FE1 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		637625CD16E762FC00EEE6D4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -310,6 +343,7 @@
 				6343A79D16EDFA6D0032CBE8 /* MovieMaker.m in Sources */,
 				6343A79F16EDFA6D0032CBE8 /* main.m in Sources */,
 				63B2F53B16EF049F00753825 /* KenBurnsAnimation.m in Sources */,
+				63B2F54016EF201900753825 /* ImageTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,11 +437,13 @@
 		};
 		637625F816E762FC00EEE6D4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1BEFDA330F1940C49AE673C1 /* Pods.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KenBurns/src/other/KenBurns-Prefix.pch";
 				INFOPLIST_FILE = "KenBurns/src/other/KenBurns-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = KenBurns;
 				WRAPPER_EXTENSION = app;
 			};
@@ -415,11 +451,13 @@
 		};
 		637625F916E762FC00EEE6D4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1BEFDA330F1940C49AE673C1 /* Pods.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KenBurns/src/other/KenBurns-Prefix.pch";
 				INFOPLIST_FILE = "KenBurns/src/other/KenBurns-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = KenBurns;
 				WRAPPER_EXTENSION = app;
 			};

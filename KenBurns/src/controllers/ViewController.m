@@ -7,13 +7,16 @@
 //
 
 #import "ViewController.h"
+#import "ImageTableViewController.h"
 #import "MovieMaker.h"
+#import "MBProgressHUD.h"
 #import <MediaPlayer/MediaPlayer.h>
 
 @interface ViewController ()
 @property (nonatomic,strong) MPMoviePlayerController* videoPlayer;
 @property (nonatomic,strong) MovieMaker* mMaker;
-@property (nonatomic,strong) IBOutlet UIActivityIndicatorView* activityView;
+@property (nonatomic,strong) MBProgressHUD* progressHUD;
+@property (nonatomic,strong) ImageTableViewController* imageTableVC;
 @end
 
 @implementation ViewController
@@ -22,13 +25,17 @@
 
 - (void) viewDidLoad {
     [super viewDidLoad];
+    [self setupImageTableViewController];
+    [self setupEditButton];
     [self setupVideoPlayer];
     [self createMovie];
+    [self setupProgressHUD];
 }
 
 - (void) viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    self.activityView.center = self.view.center;
+    self.progressHUD.center = self.view.center;
+    self.progressHUD.autoresizingMask = self.videoPlayer.view.autoresizingMask;
 }
 
 - (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
@@ -47,7 +54,28 @@
     UISaveVideoAtPathToSavedPhotosAlbum(path,self,@selector(video:didFinishSavingWithError:contextInfo:),nil);
 }
 
+- (void) editButtonAction {
+    UINavigationController* navController = [[UINavigationController alloc] initWithRootViewController:self.imageTableVC];
+    [self presentModalViewController:navController animated:YES];
+}
+
 #pragma mark - Setups
+
+- (void) setupImageTableViewController {
+    self.imageTableVC = [[ImageTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+    
+}
+
+- (void) setupEditButton {
+    UIBarButtonItem *editButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonAction)];
+    self.navigationItem.rightBarButtonItem = editButton;
+}
+
+- (void) setupProgressHUD {
+    self.progressHUD = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    [self.progressHUD setLabelText:@"Please wait..."];
+    [self.view addSubview:self.progressHUD];
+}
 
 - (void) setupVideoPlayer {
     self.videoPlayer = [[MPMoviePlayerController alloc] init];
@@ -72,7 +100,7 @@
     [self.mMaker setFrameSize:CGSizeMake(640, 360)];
     [self.mMaker setImageDuration:3];
     [self.mMaker startRecordingKenBurnsMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {
-        [self.activityView stopAnimating];
+        [self.progressHUD hide:YES];
         if ( isOK ) {
             NSLog(@"Succcess!");
             [safePointer playVideo:path];

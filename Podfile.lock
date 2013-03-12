@@ -1,0 +1,18 @@
+
+COCOAPODS: 0.16.4
+
+PODS: 
+- ELCImagePickerController (0.0.1)
+- MBProgressHUD (HEAD based on 0.5)
+
+SPEC CHECKSUMS: 
+  MBProgressHUD: b23ee11c42253d6d804e8e0bfabdc334e8b2571f
+  ELCImagePickerController: 549eaa88abafe99fb49997ee16ee24cff828f493
+
+EXTERNAL SOURCES: 
+  ELCImagePickerController: 
+    :git: https://github.com/lawrencelomax/ELCImagePickerController.git
+
+DEPENDENCIES: 
+- ELCImagePickerController (from `https://github.com/lawrencelomax/ELCImagePickerController.git')
+- MBProgressHUD (HEAD)
