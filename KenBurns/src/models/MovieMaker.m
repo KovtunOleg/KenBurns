@@ -24,7 +24,7 @@
 - (id) init {
     self = [super init];
     if ( self ) {
-        self.frameSize = CGSizeMake(480, 320); // default video frame size
+        self.frameSize = CGSizeMake(640, 360); // default video frame size
         self.imageDuration = 5; // default image duration
         [self createVideosFolder];
     }

@@ -45,10 +45,6 @@ VideoMap* gVideoMap = nil;
     [data writeToFile:filePath(videoFolderPath(),MAPS,EXT_PLIST) atomically:YES];
 }
 
-- (BOOL) hasChanges {
-    return self.lastRemovedMaps.count || self.lastAddedMaps.count;
-}
-
 - (void) setMaps:(NSMutableArray *)maps {
     _hasChanges = ![maps isEqualToArray:_maps];
     _lastAddedMaps = [NSMutableArray arrayWithArray:maps];

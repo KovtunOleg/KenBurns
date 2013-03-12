@@ -74,7 +74,7 @@
 
 - (void) setupMovieMaker {
     self.mMaker = [[MovieMaker alloc] init];
-    [self.mMaker setFrameSize:CGSizeMake(640, 360)];
+    [self.mMaker setFrameSize:__iPhone?CGSizeMake(640, 360):CGSizeMake(1280, 720)];
     [self.mMaker setImageDuration:5];
 }
 
