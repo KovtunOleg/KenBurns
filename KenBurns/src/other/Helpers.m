@@ -16,6 +16,10 @@ BOOL isIOSVersionAvailable(NSString* version) {
     return ([getIOSVersion() compare:version options:NSNumericSearch] != NSOrderedAscending);
 }
 
+BOOL isCurrentDevice(UIUserInterfaceIdiom device) {
+    return ([[UIDevice currentDevice] userInterfaceIdiom] == device);
+}
+
 BOOL isStringWithAnyText(NSString* s) {
 	return nil!=s && [s length] > 0;
 }

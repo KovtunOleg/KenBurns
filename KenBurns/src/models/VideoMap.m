@@ -19,7 +19,6 @@ VideoMap* gVideoMap = nil;
 + (VideoMap*) instance {
     if ( !gVideoMap ) {
         gVideoMap = [[VideoMap alloc] init];
-        
         gVideoMap.maps = [VideoMap readMaps];
     }
     return gVideoMap;
@@ -27,7 +26,6 @@ VideoMap* gVideoMap = nil;
 
 - (void) updateWithVideoMap:(VideoMap*)videoMap {
     [self setMaps:[NSMutableArray arrayWithArray:videoMap.maps]];
-    [self saveMaps];
 }
 
 #pragma mark - Accessors
@@ -42,8 +40,8 @@ VideoMap* gVideoMap = nil;
     return maps;
 }
 
-- (void) saveMaps {
-    NSData * data = [NSKeyedArchiver archivedDataWithRootObject:self.maps];
++ (void) saveMaps {
+    NSData * data = [NSKeyedArchiver archivedDataWithRootObject:[VideoMap instance].maps];
     [data writeToFile:filePath(videoFolderPath(),MAPS,EXT_PLIST) atomically:YES];
 }
 

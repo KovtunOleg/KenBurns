@@ -10,6 +10,7 @@
 
 NSString* getIOSVersion();
 BOOL isIOSVersionAvailable(NSString* version);
+BOOL isCurrentDevice(UIUserInterfaceIdiom device);
 
 BOOL isStringWithAnyText(NSString* s);
 NSObject* firstOrNil(NSArray* arr);

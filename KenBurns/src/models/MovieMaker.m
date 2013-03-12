@@ -50,6 +50,7 @@
                 safePointer.imageCounter--;
                 map[kPath] = path;
                 if ( 0 == safePointer.imageCounter ) {
+                    [VideoMap saveMaps];
                     [safePointer mergeVideos];
                     [safePointer exportMovieWithCompletionBlock:block path:filePath(documentFolderPath(),RESULT_VIDEO,EXT_MP4)];
                 }

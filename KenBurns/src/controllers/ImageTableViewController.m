@@ -48,7 +48,7 @@
     [albumController setParent:elcPicker];
 	[elcPicker setDelegate:self];
     
-	[self presentModalViewController:elcPicker animated:YES];
+	[self.navigationController presentModalViewController:elcPicker animated:YES];
 }
 
 - (void) cancelButtonAction {
@@ -122,7 +122,7 @@
 #pragma mark - ELCImagePickerControllerDelegate
 
 - (void) elcImagePickerController:(ELCImagePickerController *)picker didFinishPickingMediaWithInfo:(NSArray *)infoArray {
-    [self dismissModalViewControllerAnimated:YES];
+    [self.navigationController dismissModalViewControllerAnimated:YES];
 
     for (NSDictionary *info in infoArray) {
         
@@ -138,7 +138,7 @@
 }
 
 - (void) elcImagePickerControllerDidCancel:(ELCImagePickerController *)picker {
-    [self dismissModalViewControllerAnimated:YES];
+    [self.navigationController dismissModalViewControllerAnimated:YES];
 }
 
 @end

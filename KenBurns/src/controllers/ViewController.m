@@ -49,6 +49,7 @@
 
 - (void) playVideo:(NSString*)path {
     [self.videoPlayer.view setHidden:NO];
+    [self.navigationItem.rightBarButtonItem setEnabled:YES];
     [self.videoPlayer setContentURL:[NSURL fileURLWithPath:path]];
     [self.videoPlayer play];
 }
@@ -74,7 +75,7 @@
 - (void) setupMovieMaker {
     self.mMaker = [[MovieMaker alloc] init];
     [self.mMaker setFrameSize:CGSizeMake(640, 360)];
-    [self.mMaker setImageDuration:3];
+    [self.mMaker setImageDuration:5];
 }
 
 - (void) setupNavigationButtons {
@@ -111,14 +112,15 @@
 - (void) createMovie {
     [self.progressHUD show:YES];
     [self.videoPlayer.view setHidden:YES];
+    [self.navigationItem.rightBarButtonItem setEnabled:NO];
+    [self.navigationItem.leftBarButtonItem setEnabled:NO];
     
     __unsafe_unretained ViewController* safePointer = self;
     [self.mMaker startRecordingKenBurnsMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {
         [self.progressHUD hide:YES];
+        [self.navigationItem.leftBarButtonItem setEnabled:YES];
 
-        if ( !isOK ) {
-            [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-        } else {
+        if ( isOK ) {
             [safePointer playVideo:path];
         }
     }];

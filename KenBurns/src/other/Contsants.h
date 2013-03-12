@@ -7,7 +7,10 @@
 //
 
 #include <stdlib.h>
-                 
+
+#define __iPhone                        isCurrentDevice(UIUserInterfaceIdiomPhone)
+#define __iPad                          isCurrentDevice(UIUserInterfaceIdiomPad)
+
 #define __IOS5                          isIOSVersionAvailable(@"5.0")
 #define __IOS6                          isIOSVersionAvailable(@"6.0")
 

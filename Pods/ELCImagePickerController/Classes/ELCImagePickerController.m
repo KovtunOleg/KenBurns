@@ -38,7 +38,6 @@
 		[workingDictionary release];	
 	}
 	
-    [self popToRootViewControllerAnimated:NO];
     [[self parentViewController] dismissModalViewControllerAnimated:YES];
     
 	if([delegate respondsToSelector:@selector(elcImagePickerController:didFinishPickingMediaWithInfo:)]) {
