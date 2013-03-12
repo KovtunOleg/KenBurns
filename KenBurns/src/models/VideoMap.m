@@ -20,24 +20,32 @@ VideoMap* gVideoMap = nil;
     if ( !gVideoMap ) {
         gVideoMap = [[VideoMap alloc] init];
         
-        gVideoMap.maps = [NSMutableArray array];
-        NSString* path = filePath(videoFolderPath(),MAPS,EXT_PLIST);
-        if( [[NSFileManager defaultManager] fileExistsAtPath:path] ){
-            NSData * data = [NSData dataWithContentsOfFile:path];
-            gVideoMap.maps = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-        }
+        gVideoMap.maps = [VideoMap readMaps];
     }
     return gVideoMap;
 }
 
 - (void) updateWithVideoMap:(VideoMap*)videoMap {
     [self setMaps:[NSMutableArray arrayWithArray:videoMap.maps]];
-    
-    NSData * data = [NSKeyedArchiver archivedDataWithRootObject:videoMap.maps];
-    [data writeToFile:filePath(videoFolderPath(),MAPS,EXT_PLIST) atomically:YES];
+    [self saveMaps];
 }
 
 #pragma mark - Accessors
+
++ (NSMutableArray*) readMaps {
+    NSMutableArray* maps = [NSMutableArray array];
+    NSString* path = filePath(videoFolderPath(),MAPS,EXT_PLIST);
+    if( [[NSFileManager defaultManager] fileExistsAtPath:path] ){
+        NSData * data = [NSData dataWithContentsOfFile:path];
+        maps = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    }
+    return maps;
+}
+
+- (void) saveMaps {
+    NSData * data = [NSKeyedArchiver archivedDataWithRootObject:self.maps];
+    [data writeToFile:filePath(videoFolderPath(),MAPS,EXT_PLIST) atomically:YES];
+}
 
 - (BOOL) hasChanges {
     return self.lastRemovedMaps.count || self.lastAddedMaps.count;
