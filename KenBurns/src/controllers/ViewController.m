@@ -16,7 +16,6 @@
 @property (nonatomic,strong) MPMoviePlayerController* videoPlayer;
 @property (nonatomic,strong) MovieMaker* mMaker;
 @property (nonatomic,strong) MBProgressHUD* progressHUD;
-@property (nonatomic,strong) ImageTableViewController* imageTableVC;
 @end
 
 @implementation ViewController
@@ -25,7 +24,6 @@
 
 - (void) viewDidLoad {
     [super viewDidLoad];
-    [self setupImageTableViewController];
     [self setupEditButton];
     [self setupVideoPlayer];
     [self createMovie];
@@ -55,16 +53,12 @@
 }
 
 - (void) editButtonAction {
-    UINavigationController* navController = [[UINavigationController alloc] initWithRootViewController:self.imageTableVC];
+    ImageTableViewController* imageTableVC = [[ImageTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+    UINavigationController* navController = [[UINavigationController alloc] initWithRootViewController:imageTableVC];
     [self presentModalViewController:navController animated:YES];
 }
 
 #pragma mark - Setups
-
-- (void) setupImageTableViewController {
-    self.imageTableVC = [[ImageTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-    
-}
 
 - (void) setupEditButton {
     UIBarButtonItem *editButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonAction)];
@@ -73,7 +67,7 @@
 
 - (void) setupProgressHUD {
     self.progressHUD = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    [self.progressHUD setLabelText:@"Please wait..."];
+    [self.progressHUD setLabelText:@"Processing video..."];
     [self.view addSubview:self.progressHUD];
 }
 
@@ -96,7 +90,7 @@
     }
     
     __unsafe_unretained ViewController* safePointer = self;
-    self.mMaker = [[MovieMaker alloc] init];
+    //self.mMaker = [[MovieMaker alloc] init];
     [self.mMaker setFrameSize:CGSizeMake(640, 360)];
     [self.mMaker setImageDuration:3];
     [self.mMaker startRecordingKenBurnsMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {

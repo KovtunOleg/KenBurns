@@ -61,7 +61,6 @@
 
 
 - (void)dealloc {
-    NSLog(@"deallocing ELCImagePickerController");
     [super dealloc];
 }
 

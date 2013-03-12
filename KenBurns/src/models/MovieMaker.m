@@ -47,11 +47,11 @@
             [safePointer.videoMap addObject:path];
             if ( 0 == safePointer.imageCounter ) {
                 [safePointer mergeVideos];
-                [safePointer exportMovieWithCompletionBlock:block path:FILE_PATH(DOCUMENT_FOLDER_PATH,RESULT_VIDEO,EXT_MP4)];
+                [safePointer exportMovieWithCompletionBlock:block path:filePath(documentFolderPath(),RESULT_VIDEO,EXT_MP4)];
             }
             
             
-        } path:FILE_PATH(VIDEO_FOLDER_PATH,image.description,EXT_MP4)];
+        } path:filePath(videoFolderPath(),image.description,EXT_MP4)];
     }
 }
 
@@ -63,8 +63,8 @@
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:url options:nil];
     self.composition = [AVMutableComposition composition];
     
-    AVMutableCompositionTrack *trackA = [self.composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
-    [trackA insertTimeRange:videoRange ofTrack:[[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:kCMTimeZero error:nil];
+    AVMutableCompositionTrack *track = [self.composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    [track insertTimeRange:videoRange ofTrack:[[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:kCMTimeZero error:nil];
     
     CALayer *parentLayer = [CALayer layer];
     CALayer *videoLayer = [CALayer layer];
@@ -74,7 +74,7 @@
 
     AVMutableVideoCompositionInstruction *instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
     instruction.timeRange = videoRange;
-    AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:trackA];
+    AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:track];
     instruction.layerInstructions = @[layerInstruction];
     
     [self updateVideoCompositionWith:instruction
@@ -95,23 +95,6 @@
             });
         }
     }];
-}
-
-- (void) removeFile:(NSString*)path {
-    if( [[NSFileManager defaultManager] fileExistsAtPath:path] ){
-        [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-    }
-}
-
-- (void) createVideosFolder {
-    NSString* videosFolderPath = VIDEO_FOLDER_PATH;
-    
-    if (![[NSFileManager defaultManager] fileExistsAtPath:videosFolderPath isDirectory:nil]) {
-        [[NSFileManager defaultManager] createDirectoryAtPath:videosFolderPath
-                                       withIntermediateDirectories:YES
-                                                        attributes:nil
-                                                        error:nil];
-    }
 }
 
 - (void) updateVideoCompositionWith:(AVMutableVideoCompositionInstruction*)instruction animationTool:(AVVideoCompositionCoreAnimationTool*)animationTool {
@@ -145,6 +128,25 @@
     instruction.layerInstructions = layerInstructions;
     
     [self updateVideoCompositionWith:instruction animationTool:nil];
+}
+
+#pragma mark - Directory manipulations
+
+- (void) removeFile:(NSString*)path {
+    if( [[NSFileManager defaultManager] fileExistsAtPath:path] ){
+        [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+    }
+}
+
+- (void) createVideosFolder {
+    NSString* videosFolderPath = videoFolderPath();
+    
+    if ( ![[NSFileManager defaultManager] fileExistsAtPath:videosFolderPath isDirectory:nil] ) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:videosFolderPath
+                                  withIntermediateDirectories:YES
+                                                   attributes:nil
+                                                        error:nil];
+    }
 }
 
 @end

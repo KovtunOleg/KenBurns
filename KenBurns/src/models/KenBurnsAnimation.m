@@ -98,8 +98,8 @@ KenBurnsAnimation* gKenBurnsAnimation = nil;
     int maxDeviation = MIN(self.frameSize.width,self.frameSize.height)*(MIN_SCALE-1);
 	[trackPath moveToPoint:startPoint];
     for (UIImage* image in self.images) {
-        NSInteger dx = (arc4random()%maxDeviation)*PLUS_OR_MINUS;
-        NSInteger dy = (arc4random()%maxDeviation)*PLUS_OR_MINUS;
+        NSInteger dx = (arc4random()%maxDeviation)*plusOrMinus();
+        NSInteger dy = (arc4random()%maxDeviation)*plusOrMinus();
         [trackPath addLineToPoint:P(startPoint.x+dx, startPoint.y+dy)];
     }
     return trackPath;
@@ -109,7 +109,7 @@ KenBurnsAnimation* gKenBurnsAnimation = nil;
     NSMutableArray* scaleArray = [NSMutableArray arrayWithCapacity:[self.images count]];
     for (UIImage* image in self.images) {
         float scale = (((float) (arc4random() % ((unsigned)RAND_MAX + 1)) / RAND_MAX) * MAX_SCALE) + MIN_SCALE;
-        [scaleArray addObject:SCALE(scale)];
+        [scaleArray addObject:S(scale)];
     }
     return scaleArray;
 }

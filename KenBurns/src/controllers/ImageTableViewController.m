@@ -7,113 +7,134 @@
 //
 
 #import "ImageTableViewController.h"
+#import "ImageCell.h"
+#import "ELCImagePickerController.h"
+#import "ELCAlbumPickerController.h"
+#import "VideoMap.h"
+#import <MobileCoreServices/MobileCoreServices.h>
 
-@interface ImageTableViewController ()
-
+@interface ImageTableViewController () <ELCImagePickerControllerDelegate>
+@property (nonatomic,copy) VideoMap* tempVideoMap;
 @end
 
 @implementation ImageTableViewController
 
-- (id)initWithStyle:(UITableViewStyle)style
-{
+- (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
-        // Custom initialization
+        self.tempVideoMap = [VideoMap instance];
+        [self setupNavigationButtons];
+        self.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+        self.editing = YES;
     }
     return self;
 }
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
+#pragma mark - Actions
 
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
- 
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+- (void) doneButtonAction {
+    [VideoMap updateWithVideoMap:self.tempVideoMap];
+    
+    [self.presentingViewController dismissModalViewControllerAnimated:YES];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void) addButtonAction {
+    ELCAlbumPickerController *albumController = [[ELCAlbumPickerController alloc] initWithNibName:@"ELCAlbumPickerController" bundle:[NSBundle mainBundle]];
+	ELCImagePickerController *elcPicker = [[ELCImagePickerController alloc] initWithRootViewController:albumController];
+    [albumController setParent:elcPicker];
+	[elcPicker setDelegate:self];
+    
+	[self presentModalViewController:elcPicker animated:YES];
+}
+
+- (void) cancelButtonAction {
+    [self.presentingViewController dismissModalViewControllerAnimated:YES];
+}
+
+#pragma mark - Setups
+
+- (void) setupNavigationButtons {
+    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonAction)];
+    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonAction)];
+    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonAction)];
+    self.navigationItem.rightBarButtonItems = @[addButton,doneButton];
+    self.navigationItem.leftBarButtonItem = cancelButton;
 }
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
     // Return the number of sections.
     return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
-    return 1;
+    return [self.tempVideoMap images].count;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *CellIdentifier = @"Cell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
-    
-    // Configure the cell...
-    
-    return cell;
+    ImageCell *imageCell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+
+    if ( imageCell == nil ) {
+        imageCell = [ImageCell imageCell];
+    }
+    [imageCell setImageVideo:[self.tempVideoMap images][indexPath.row]];
+    return imageCell;
 }
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
+
+- (BOOL) tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     return YES;
 }
-*/
 
-/*
 // Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void) tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
+        [self.tempVideoMap removeImageAtIndex:indexPath.row];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
+    }  
 }
-*/
 
-/*
 // Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
+- (void) tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
+    [self.tempVideoMap moveImageFromIndex:fromIndexPath.row atIndex:toIndexPath.row];
 }
-*/
 
-/*
 // Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (BOOL) tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
     // Return NO if you do not want the item to be re-orderable.
     return YES;
 }
-*/
 
 #pragma mark - Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     */
+- (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return [ImageCell height];
+}
+
+#pragma mark - ELCImagePickerControllerDelegate
+
+- (void) elcImagePickerController:(ELCImagePickerController *)picker didFinishPickingMediaWithInfo:(NSArray *)infoArray {
+    [self dismissModalViewControllerAnimated:YES];
+
+    for (NSDictionary *info in infoArray) {
+        NSString* mediaType = [info objectForKey:UIImagePickerControllerMediaType];
+        
+        if ([mediaType isEqualToString:ALAssetTypePhoto]) {
+            
+            NSString *key = [[info objectForKey:UIImagePickerControllerReferenceURL] absoluteString];
+            UIImage* image = [info objectForKey:UIImagePickerControllerOriginalImage];
+            [self.tempVideoMap addImage:image forKey:key];
+        }
+    }
+    [self.tableView reloadData];
+}
+
+- (void) elcImagePickerControllerDidCancel:(ELCImagePickerController *)picker {
+    [self dismissModalViewControllerAnimated:YES];
 }
 
 @end

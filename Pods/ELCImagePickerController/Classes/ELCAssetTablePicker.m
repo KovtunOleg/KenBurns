@@ -41,7 +41,6 @@
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
 	
-    NSLog(@"enumerating photos");
     [self.assetGroup enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) 
      {         
          if(result == nil) 
@@ -52,8 +51,7 @@
          ELCAsset *elcAsset = [[[ELCAsset alloc] initWithAsset:result] autorelease];
          [elcAsset setParent:self];
          [self.elcAssets addObject:elcAsset];
-     }];    
-    NSLog(@"done enumerating photos");
+     }];
 	
 	[self.tableView reloadData];
 	[self.navigationItem setTitle:@"Pick Photos"];
@@ -93,8 +91,6 @@
     
 	int index = (_indexPath.row*4);
 	int maxIndex = (_indexPath.row*4+3);
-    
-	// NSLog(@"Getting assets for %d to %d with array count %d", index, maxIndex, [assets count]);
     
 	if(maxIndex < [self.elcAssets count]) {
         
