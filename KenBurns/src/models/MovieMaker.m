@@ -7,17 +7,16 @@
 //
 
 #import "MovieMaker.h"
+#import "KenBurnsAnimation.h"
 #import <CoreMedia/CoreMedia.h>
 #import <AVFoundation/AVFoundation.h>
 #import <CoreVideo/CoreVideo.h>
-#include <stdlib.h>
-
-#define MIN_SCALE       1.1 // must be more then 1.0
-#define MAX_SCALE       2.0
 
 @interface MovieMaker ()
-@property (nonatomic,strong) AVMutableComposition* cmp;
-@property (nonatomic,strong) AVMutableVideoComposition* animComp;
+@property (nonatomic,strong) AVMutableComposition* composition;
+@property (nonatomic,strong) AVMutableVideoComposition* videoComposition;
+@property (nonatomic,strong) NSMutableArray* videoMap;
+@property (nonatomic,assign) NSUInteger imageCounter;
 @end
 
 @implementation MovieMaker
@@ -25,134 +24,116 @@
 - (id) init {
     self = [super init];
     if ( self ) {
-        self.frameSize = CGSizeMake(320, 480); // default video frame size
-        self.duration = 15; // default video duration
+        self.frameSize = CGSizeMake(480, 320); // default video frame size
+        self.imageDuration = 5; // default image duration
+        self.videoMap = [NSMutableArray array];
     }
     return self;
 }
 
 #pragma mark - Movie creation methods
 
-- (void) startRecordingKenBurnsMovieWithCompletionBlock:(onVideoCreatedBlock)block {
-    [self createKenBurnsMovie];
-    [self exportMovieWithCompletionBlock:block];
+- (void) startRecordingKenBurnsMovieWithCompletionBlock:(onVideoCreatedBlock)block images:(NSArray*)images {
+    
+    self.imageCounter = [images count];
+    
+    __unsafe_unretained MovieMaker* safePointer = self;
+    for (UIImage* image in images) {
+        [self createKenBurnsMovie:image];
+        [self exportMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {
+            
+            safePointer.imageCounter--;
+            [safePointer.videoMap addObject:path];
+            if ( 0 == safePointer.imageCounter ) {
+                [safePointer mergeVideos];
+                [safePointer exportMovieWithCompletionBlock:block fileName:RESULT_VIDEO];
+            }
+            
+            
+        } fileName:image.description];
+    }
 }
 
-- (void) createKenBurnsMovie {
-    CMTimeRange videoRange =  CMTimeRangeMake(kCMTimeZero, CMTimeMake(self.duration, 1));
-    CALayer *aLayer = [self buildKenBurnsLayer];
+- (void) createKenBurnsMovie:(UIImage*)image {
+    CMTimeRange videoRange = CMTimeRangeMake(kCMTimeZero, CMTimeMake(self.imageDuration, 1));
+    CALayer *aLayer = [KenBurnsAnimation buildKenBurnsLayer:@[image] frameSize:self.frameSize duration:self.imageDuration];
     
     NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:TEMP_VIDEO ofType:EXT_MP4]];
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:url options:nil];
-    self.cmp = [AVMutableComposition composition];
+    self.composition = [AVMutableComposition composition];
     
-    AVMutableCompositionTrack *trackA = [self.cmp addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
-    AVAssetTrack *sourceVideoTrack = [[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
-    [trackA insertTimeRange:videoRange ofTrack:sourceVideoTrack atTime:kCMTimeZero error:nil];
+    AVMutableCompositionTrack *trackA = [self.composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    [trackA insertTimeRange:videoRange ofTrack:[[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:kCMTimeZero error:nil];
     
-    self.animComp = [AVMutableVideoComposition videoComposition];
-    self.animComp.renderSize = self.frameSize;
-    self.animComp.frameDuration = CMTimeMake(1,30);
     CALayer *parentLayer = [CALayer layer];
     CALayer *videoLayer = [CALayer layer];
     parentLayer.frame = videoLayer.frame = (CGRect){CGPointZero,self.frameSize};
     [parentLayer addSublayer:videoLayer];
     [parentLayer addSublayer:aLayer];
-    self.animComp.animationTool = [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
+
     AVMutableVideoCompositionInstruction *instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
     instruction.timeRange = videoRange;
     AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:trackA];
     instruction.layerInstructions = @[layerInstruction];
-    self.animComp.instructions = @[instruction];
+    
+    [self updateVideoCompositionWith:instruction
+                       animationTool:[AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer]];
 }
 
--(void) exportMovieWithCompletionBlock:(onVideoCreatedBlock)block {
-    NSString *fileName = DOCUMENT_FILE_PATH(RESULT_VIDEO,EXT_MP4);
-    if( [[NSFileManager defaultManager] fileExistsAtPath:fileName] ){
-        [[NSFileManager defaultManager] removeItemAtPath:fileName error:nil];
-    }
+-(void) exportMovieWithCompletionBlock:(onVideoCreatedBlock)block fileName:(NSString*)fileName {
+    NSString *path = DOCUMENT_FILE_PATH(fileName,EXT_MP4);
+    [self removeFile:path];
     
-    __block AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:self.cmp presetName:AVAssetExportPresetHighestQuality];
-    exporter.outputURL = [NSURL fileURLWithPath:fileName];
-    exporter.videoComposition = self.animComp;
+    __block AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:self.composition presetName:AVAssetExportPresetHighestQuality];
+    exporter.outputURL = [NSURL fileURLWithPath:path];
+    exporter.videoComposition = self.videoComposition;
     exporter.outputFileType = AVFileTypeQuickTimeMovie;
-    [exporter exportAsynchronouslyWithCompletionHandler:^(void){
+    [exporter exportAsynchronouslyWithCompletionHandler:^{
         if ( block ) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                block(fileName,exporter.status == AVAssetExportSessionStatusCompleted);
+                block(path,exporter.status == AVAssetExportSessionStatusCompleted);
             });
         }
     }];
 }
 
-#pragma mark - Ken Berns Animation
-
-- (CALayer*) buildKenBurnsLayer {
-    
-    CALayer* imageLayer    = [CALayer layer];
-    imageLayer.bounds      = (CGRect){CGPointZero,self.frameSize};
-    imageLayer.contentsGravity = kCAGravityResizeAspect;
-    
-    [imageLayer addAnimation:[self KenBurnsAnimation] forKey:@"KenBurns"];
-    
-    return imageLayer;
-}
-
-- (CAAnimationGroup*) KenBurnsAnimation {
-    
-    CAKeyframeAnimation *anim = [CAKeyframeAnimation animationWithKeyPath:@"contents"];
-    anim.values = self.imageArray;
-    anim.keyTimes = [self keyTimes];
-    
-    CAKeyframeAnimation *moveAnim = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-    moveAnim.path = [self trackPath].CGPath;
-    moveAnim.additive = YES;
-    moveAnim.removedOnCompletion = NO;
-    
-    CAKeyframeAnimation *scaleAnim = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
-    scaleAnim.values = [self scaleArray];
-    scaleAnim.removedOnCompletion = NO;
-    scaleAnim.additive = YES;
-    
-    CAAnimationGroup *animGroup = [CAAnimationGroup animation];
-    animGroup.animations = @[anim,moveAnim,scaleAnim];
-    animGroup.beginTime = 1e-100;
-    animGroup.duration = self.duration;
-    animGroup.removedOnCompletion = NO;
-    return animGroup;
-}
-
-- (NSArray*) keyTimes {
-    NSMutableArray* keyTimes = [NSMutableArray arrayWithCapacity:[self.imageArray count]];
-    CGFloat step = 1./[self.imageArray count];
-    CGFloat keyTime = step;
-    for (UIImage* image in self.imageArray) {
-        [keyTimes addObject:@(keyTime)];
-        keyTime += step;
+- (void) removeFile:(NSString*)path {
+    if( [[NSFileManager defaultManager] fileExistsAtPath:path] ){
+        [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
     }
-    return keyTimes;
 }
 
-- (UIBezierPath*) trackPath {
-    UIBezierPath *trackPath = [UIBezierPath bezierPath];
-    CGPoint startPoint = P(self.frameSize.width/2,self.frameSize.height/2);
-    int maxDeviation = MIN(self.frameSize.width,self.frameSize.height)*(MIN_SCALE-1);
-	[trackPath moveToPoint:startPoint];
-    for (UIImage* image in self.imageArray) {
-        NSInteger dx = (arc4random()%maxDeviation)*PLUS_OR_MINUS;
-        NSInteger dy = (arc4random()%maxDeviation)*PLUS_OR_MINUS;
-        [trackPath addLineToPoint:P(startPoint.x+dx, startPoint.y+dy)];
-    }
-    return trackPath;
+- (void) updateVideoCompositionWith:(AVMutableVideoCompositionInstruction*)instruction animationTool:(AVVideoCompositionCoreAnimationTool*)animationTool {
+    self.videoComposition = [AVMutableVideoComposition videoComposition];
+    self.videoComposition.renderSize = self.frameSize;
+    self.videoComposition.frameDuration = CMTimeMake(1,30);
+    self.videoComposition.instructions = @[instruction];
+    self.videoComposition.animationTool = animationTool;
 }
 
-- (NSArray*) scaleArray {
-    NSMutableArray* scaleArray = [NSMutableArray arrayWithCapacity:[self.imageArray count]];
-    for (UIImage* image in self.imageArray) {
-        float scale = (((float) (arc4random() % ((unsigned)RAND_MAX + 1)) / RAND_MAX) * MAX_SCALE) + MIN_SCALE;
-        [scaleArray addObject:SCALE(scale)];
+- (void) mergeVideos {
+    
+    self.composition = [AVMutableComposition composition];
+    NSMutableArray* layerInstructions = [NSMutableArray array];
+    CMTime duration = kCMTimeZero;
+    for (NSString* path in self.videoMap) {
+        NSURL *urlVideo = [NSURL fileURLWithPath:path];
+        AVURLAsset* videoAsset = [[AVURLAsset alloc] initWithURL:urlVideo options:nil];
+        
+        AVMutableCompositionTrack *track = [self.composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+        [track insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAsset.duration) ofTrack:[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:duration error:nil];
+        duration = CMTimeAdd(duration, CMTimeSubtract(videoAsset.duration, CMTimeMake(1, 1)));
+        
+        AVMutableVideoCompositionLayerInstruction * layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:track];
+        [layerInstruction setOpacityRampFromStartOpacity:1.0f toEndOpacity:0.0f timeRange:CMTimeRangeMake(duration, CMTimeMake(1, 1))];
+        [layerInstructions addObject:layerInstruction];
     }
-    return scaleArray;
+    
+    AVMutableVideoCompositionInstruction * instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+    instruction.timeRange = CMTimeRangeMake(kCMTimeZero, self.composition.duration);
+    instruction.layerInstructions = layerInstructions;
+    
+    [self updateVideoCompositionWith:instruction animationTool:nil];
 }
 
 @end

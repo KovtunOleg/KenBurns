@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 Oleg Kovtun. All rights reserved.
 //
 
+#include <stdlib.h>
+
 #define __IOS_VERSION                   [[UIDevice currentDevice] systemVersion]
 #define __IOS(version)                  ([__IOS_VERSION compare:version options:NSNumericSearch] != NSOrderedAscending)
 #define __IOS5                          __IOS(@"5.0")

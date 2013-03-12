@@ -13,8 +13,7 @@ typedef void(^onVideoCreatedBlock)(NSString* path, BOOL isOK);
 @interface MovieMaker : NSObject {
     
 }
-@property (nonatomic,unsafe_unretained) NSArray* imageArray; // array of CGImages
 @property (nonatomic,assign) CGSize frameSize;
-@property (nonatomic,assign) CGFloat duration;
-- (void) startRecordingKenBurnsMovieWithCompletionBlock:(onVideoCreatedBlock)block;
+@property (nonatomic,assign) CGFloat imageDuration;
+- (void) startRecordingKenBurnsMovieWithCompletionBlock:(onVideoCreatedBlock)block images:(NSArray*)images;
 @end

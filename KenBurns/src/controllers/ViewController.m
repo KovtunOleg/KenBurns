@@ -64,14 +64,13 @@
     NSMutableArray* imagesForVideo = [NSMutableArray array];
     for (NSUInteger i = 1; i <= 5; i++) {
         UIImage* image = [UIImage imageNamed:[NSString stringWithFormat:@"Photo_%d.jpg",i]];
-        [imagesForVideo addObject:(id)image.CGImage];
+        [imagesForVideo addObject:image];
     }
     
     __unsafe_unretained ViewController* safePointer = self;
     self.mMaker = [[MovieMaker alloc] init];
-    [self.mMaker setImageArray:imagesForVideo];
-    [self.mMaker setFrameSize:CGSizeMake(1920, 1080)];
-    [self.mMaker setDuration:25];
+    [self.mMaker setFrameSize:CGSizeMake(640, 360)];
+    [self.mMaker setImageDuration:3];
     [self.mMaker startRecordingKenBurnsMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {
         [self.activityView stopAnimating];
         if ( isOK ) {
@@ -80,7 +79,7 @@
         } else {
             NSLog(@"Fail!");
         }
-    }];
+    } images:imagesForVideo];
 }
 
 #pragma mark - Video saving delegate

@@ -31,6 +31,7 @@
 		6376263116E76C1300EEE6D4 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6376263016E76C1300EEE6D4 /* CoreMedia.framework */; };
 		6376263A16E77E2A00EEE6D4 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6376263916E77E2A00EEE6D4 /* MediaPlayer.framework */; };
 		6386026616E8A489009D8D21 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6386026516E8A489009D8D21 /* QuartzCore.framework */; };
+		63B2F53B16EF049F00753825 /* KenBurnsAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B2F53A16EF049F00753825 /* KenBurnsAnimation.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -65,6 +66,8 @@
 		6376263016E76C1300EEE6D4 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		6376263916E77E2A00EEE6D4 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		6386026516E8A489009D8D21 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		63B2F53916EF049F00753825 /* KenBurnsAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KenBurnsAnimation.h; sourceTree = "<group>"; };
+		63B2F53A16EF049F00753825 /* KenBurnsAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KenBurnsAnimation.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,6 +176,8 @@
 			children = (
 				6343A78716EDFA6D0032CBE8 /* MovieMaker.h */,
 				6343A78816EDFA6D0032CBE8 /* MovieMaker.m */,
+				63B2F53916EF049F00753825 /* KenBurnsAnimation.h */,
+				63B2F53A16EF049F00753825 /* KenBurnsAnimation.m */,
 			);
 			path = models;
 			sourceTree = "<group>";
@@ -304,6 +309,7 @@
 				6343A79C16EDFA6D0032CBE8 /* ViewController.m in Sources */,
 				6343A79D16EDFA6D0032CBE8 /* MovieMaker.m in Sources */,
 				6343A79F16EDFA6D0032CBE8 /* main.m in Sources */,
+				63B2F53B16EF049F00753825 /* KenBurnsAnimation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
