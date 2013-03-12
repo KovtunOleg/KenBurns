@@ -14,11 +14,15 @@
 + (VideoMap*) instance;
 + (void) updateWithVideoMap:(VideoMap*)videoMap;
 
-- (void) addImage:(UIImage*)image forKey:(NSString*)key;
-- (void) addPath:(NSString*)path forKey:(NSString*)key;
-- (void) removeImageAtIndex:(NSUInteger)index;
-- (void) moveImageFromIndex:(NSUInteger)fromIndex atIndex:(NSUInteger)atIndex;
+- (void) addMapWithImage:(UIImage*)image info:(NSString*)info;
+
+- (void) addPath:(NSString*)path atIndex:(NSUInteger)index;
+- (void) removeMapAtIndex:(NSUInteger)index;
+- (void) moveMapFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex;
 
 - (NSArray*) images;
 - (NSArray*) paths;
+- (NSArray*) infos;
+
+- (BOOL) containsInfo:(NSString*)info;
 @end

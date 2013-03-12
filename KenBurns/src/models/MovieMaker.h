@@ -8,12 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void(^onVideoCreatedBlock)(NSString* path, BOOL isOK);
+typedef void(^onVideoCreatedBlock)(NSString* path, NSUInteger index, BOOL isOK);
 
 @interface MovieMaker : NSObject {
     
 }
 @property (nonatomic,assign) CGSize frameSize;
 @property (nonatomic,assign) CGFloat imageDuration;
-- (void) startRecordingKenBurnsMovieWithCompletionBlock:(onVideoCreatedBlock)block images:(NSArray*)images;
+- (void) startRecordingKenBurnsMovieWithCompletionBlock:(onVideoCreatedBlock)block;
 @end

@@ -35,6 +35,9 @@
 - (void) doneButtonAction {
     [VideoMap updateWithVideoMap:self.tempVideoMap];
     
+    if ( self.onDoneBlock ) {
+        self.onDoneBlock();
+    }
     [self.presentingViewController dismissModalViewControllerAnimated:YES];
 }
 
@@ -93,14 +96,14 @@
 - (void) tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
-        [self.tempVideoMap removeImageAtIndex:indexPath.row];
+        [self.tempVideoMap removeMapAtIndex:indexPath.row];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }  
 }
 
 // Override to support rearranging the table view.
 - (void) tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-    [self.tempVideoMap moveImageFromIndex:fromIndexPath.row atIndex:toIndexPath.row];
+    [self.tempVideoMap moveMapFromIndex:fromIndexPath.row toIndex:toIndexPath.row];
 }
 
 // Override to support conditional rearranging of the table view.
@@ -121,13 +124,13 @@
     [self dismissModalViewControllerAnimated:YES];
 
     for (NSDictionary *info in infoArray) {
-        NSString* mediaType = [info objectForKey:UIImagePickerControllerMediaType];
         
-        if ([mediaType isEqualToString:ALAssetTypePhoto]) {
-            
-            NSString *key = [[info objectForKey:UIImagePickerControllerReferenceURL] absoluteString];
+        NSString* mediaType = [info objectForKey:UIImagePickerControllerMediaType];
+        NSString *key = [[info objectForKey:UIImagePickerControllerReferenceURL] absoluteString];
+        
+        if ([mediaType isEqualToString:ALAssetTypePhoto] && ![self.tempVideoMap containsInfo:key]) {
             UIImage* image = [info objectForKey:UIImagePickerControllerOriginalImage];
-            [self.tempVideoMap addImage:image forKey:key];
+            [self.tempVideoMap addMapWithImage:image info:key];
         }
     }
     [self.tableView reloadData];

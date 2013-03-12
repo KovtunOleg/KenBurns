@@ -26,14 +26,12 @@
     [super viewDidLoad];
     [self setupEditButton];
     [self setupVideoPlayer];
-    [self createMovie];
     [self setupProgressHUD];
 }
 
 - (void) viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     self.progressHUD.center = self.view.center;
-    self.progressHUD.autoresizingMask = self.videoPlayer.view.autoresizingMask;
 }
 
 - (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
@@ -54,6 +52,9 @@
 
 - (void) editButtonAction {
     ImageTableViewController* imageTableVC = [[ImageTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+    imageTableVC.onDoneBlock = ^ {
+        [self createMovie];
+    };
     UINavigationController* navController = [[UINavigationController alloc] initWithRootViewController:imageTableVC];
     [self presentModalViewController:navController animated:YES];
 }
@@ -66,7 +67,8 @@
 }
 
 - (void) setupProgressHUD {
-    self.progressHUD = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    self.progressHUD = [[MBProgressHUD alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
+    self.progressHUD.autoresizingMask = self.videoPlayer.view.autoresizingMask;
     [self.progressHUD setLabelText:@"Processing video..."];
     [self.view addSubview:self.progressHUD];
 }
@@ -83,17 +85,13 @@
 }
 
 - (void) createMovie {
-    NSMutableArray* imagesForVideo = [NSMutableArray array];
-    for (NSUInteger i = 1; i <= 5; i++) {
-        UIImage* image = [UIImage imageNamed:[NSString stringWithFormat:@"Photo_%d.jpg",i]];
-        [imagesForVideo addObject:image];
-    }
+    [self.progressHUD show:YES];
     
     __unsafe_unretained ViewController* safePointer = self;
-    //self.mMaker = [[MovieMaker alloc] init];
+    self.mMaker = [[MovieMaker alloc] init];
     [self.mMaker setFrameSize:CGSizeMake(640, 360)];
     [self.mMaker setImageDuration:3];
-    [self.mMaker startRecordingKenBurnsMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {
+    [self.mMaker startRecordingKenBurnsMovieWithCompletionBlock:^(NSString *path, NSUInteger index, BOOL isOK) {
         [self.progressHUD hide:YES];
         if ( isOK ) {
             NSLog(@"Succcess!");
@@ -101,7 +99,7 @@
         } else {
             NSLog(@"Fail!");
         }
-    } images:imagesForVideo];
+    }];
 }
 
 #pragma mark - Video saving delegate

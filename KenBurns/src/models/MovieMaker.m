@@ -7,6 +7,7 @@
 //
 
 #import "MovieMaker.h"
+#import "VideoMap.h"
 #import "KenBurnsAnimation.h"
 #import <CoreMedia/CoreMedia.h>
 #import <AVFoundation/AVFoundation.h>
@@ -15,7 +16,6 @@
 @interface MovieMaker ()
 @property (nonatomic,strong) AVMutableComposition* composition;
 @property (nonatomic,strong) AVMutableVideoComposition* videoComposition;
-@property (nonatomic,strong) NSMutableArray* videoMap;
 @property (nonatomic,assign) NSUInteger imageCounter;
 @end
 
@@ -26,7 +26,6 @@
     if ( self ) {
         self.frameSize = CGSizeMake(480, 320); // default video frame size
         self.imageDuration = 5; // default image duration
-        self.videoMap = [NSMutableArray array];
         [self createVideosFolder];
     }
     return self;
@@ -34,24 +33,25 @@
 
 #pragma mark - Movie creation methods
 
-- (void) startRecordingKenBurnsMovieWithCompletionBlock:(onVideoCreatedBlock)block images:(NSArray*)images {
+- (void) startRecordingKenBurnsMovieWithCompletionBlock:(onVideoCreatedBlock)block {
     
+    NSArray* images = [[VideoMap instance] images];
     self.imageCounter = [images count];
     
     __unsafe_unretained MovieMaker* safePointer = self;
     for (UIImage* image in images) {
         [self createKenBurnsMovie:image];
-        [self exportMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {
+        [self exportMovieWithCompletionBlock:^(NSString *path, NSUInteger index, BOOL isOK) {
             
             safePointer.imageCounter--;
-            [safePointer.videoMap addObject:path];
+            [[VideoMap instance] addPath:path atIndex:index];
             if ( 0 == safePointer.imageCounter ) {
                 [safePointer mergeVideos];
-                [safePointer exportMovieWithCompletionBlock:block path:filePath(documentFolderPath(),RESULT_VIDEO,EXT_MP4)];
+                [safePointer exportMovieWithCompletionBlock:block path:filePath(documentFolderPath(),RESULT_VIDEO,EXT_MP4) index:0];
             }
             
             
-        } path:filePath(videoFolderPath(),image.description,EXT_MP4)];
+        } path:filePath(videoFolderPath(),image.description,EXT_MP4) index:[images indexOfObject:image]];
     }
 }
 
@@ -81,7 +81,7 @@
                        animationTool:[AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer]];
 }
 
--(void) exportMovieWithCompletionBlock:(onVideoCreatedBlock)block path:(NSString*)path {
+-(void) exportMovieWithCompletionBlock:(onVideoCreatedBlock)block path:(NSString*)path index:(NSUInteger)index {
     [self removeFile:path];
     
     __block AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:self.composition presetName:AVAssetExportPresetHighestQuality];
@@ -91,7 +91,7 @@
     [exporter exportAsynchronouslyWithCompletionHandler:^{
         if ( block ) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                block(path,exporter.status == AVAssetExportSessionStatusCompleted);
+                block(path,index,exporter.status == AVAssetExportSessionStatusCompleted);
             });
         }
     }];
@@ -110,7 +110,7 @@
     self.composition = [AVMutableComposition composition];
     NSMutableArray* layerInstructions = [NSMutableArray array];
     CMTime duration = kCMTimeZero;
-    for (NSString* path in self.videoMap) {
+    for (NSString* path in [[VideoMap instance] paths] ) {
         NSURL *urlVideo = [NSURL fileURLWithPath:path];
         AVURLAsset* videoAsset = [[AVURLAsset alloc] initWithURL:urlVideo options:nil];
         

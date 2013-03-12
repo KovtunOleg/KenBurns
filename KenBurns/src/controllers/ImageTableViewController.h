@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ImageTableViewController : UITableViewController
-
+@interface ImageTableViewController : UITableViewController {
+    
+}
+@property (nonatomic,copy) void(^onDoneBlock)(void);
 @end
