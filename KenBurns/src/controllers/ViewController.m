@@ -54,10 +54,19 @@
     [self.videoPlayer play];
 }
 
+- (void) stopVideo {
+    [self.progressHUD show:YES];
+    [self.videoPlayer.view setHidden:YES];
+    [self.navigationItem.rightBarButtonItem setEnabled:NO];
+    [self.navigationItem.leftBarButtonItem setEnabled:NO];
+    [self.videoPlayer stop];
+}
+
 - (void) editButtonAction {
     ImageTableViewController* imageTableVC = [[ImageTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
     imageTableVC.onDoneBlock = ^ {
         if ( [[VideoMap instance] hasChanges] ) {
+            [self stopVideo];
             [self createMovie];
         }
     };
@@ -110,11 +119,6 @@
 }
 
 - (void) createMovie {
-    [self.progressHUD show:YES];
-    [self.videoPlayer.view setHidden:YES];
-    [self.navigationItem.rightBarButtonItem setEnabled:NO];
-    [self.navigationItem.leftBarButtonItem setEnabled:NO];
-    
     __unsafe_unretained ViewController* safePointer = self;
     [self.mMaker startRecordingKenBurnsMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {
         [self.progressHUD hide:YES];
