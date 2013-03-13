@@ -52,7 +52,6 @@
                 map[kPath] = path;
                 
                 if ( 0 == safePointer.imageCounter ) {
-                    [VideoMap saveMaps];
                     [safePointer mergeVideosWithCompletionBlock:block];
                 }
                 
@@ -138,7 +137,7 @@
             [brokenMaps addObject:[[VideoMap instance] mapAtIndex:[paths indexOfObject:path]]];
         }
     }
-    [self checkBrokenMaps:brokenMaps];
+    [self checkBrokenMapsAndSave:brokenMaps];
     
     AVMutableVideoCompositionInstruction * instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
     instruction.timeRange = CMTimeRangeMake(kCMTimeZero, self.composition.duration);
@@ -177,13 +176,14 @@
 
 #pragma mark - UIAlertView
 
-- (void) checkBrokenMaps:(NSArray*)brokenMaps {
+- (void) checkBrokenMapsAndSave:(NSArray*)brokenMaps {
     if ( [brokenMaps count] > 0 ) {
         [[VideoMap instance] removeMaps:brokenMaps];
         
         UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Some of images are failed to render. Try to re add them." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alertView show];
     }
+    [VideoMap saveMaps];
 }
 
 @end
