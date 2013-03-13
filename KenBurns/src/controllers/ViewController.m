@@ -66,7 +66,6 @@
     ImageTableViewController* imageTableVC = [[ImageTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
     imageTableVC.onDoneBlock = ^ {
         if ( [[VideoMap instance] hasChanges] ) {
-            [self stopVideo];
             [self createMovie];
         }
     };
@@ -119,6 +118,8 @@
 }
 
 - (void) createMovie {
+    [self stopVideo];
+    
     __unsafe_unretained ViewController* safePointer = self;
     [self.mMaker startRecordingKenBurnsMovieWithCompletionBlock:^(NSString *path, BOOL isOK) {
         [self.progressHUD hide:YES];
@@ -126,6 +127,10 @@
 
         if ( isOK ) {
             [safePointer playVideo:path];
+        } else {
+            if( [[NSFileManager defaultManager] fileExistsAtPath:path] ){
+                [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+            }
         }
     }];
 }

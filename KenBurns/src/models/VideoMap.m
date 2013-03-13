@@ -32,9 +32,8 @@ VideoMap* gVideoMap = nil;
 
 + (NSMutableArray*) readMaps {
     NSMutableArray* maps = [NSMutableArray array];
-    NSString* path = filePath(videoFolderPath(),MAPS,EXT_PLIST);
-    if( [[NSFileManager defaultManager] fileExistsAtPath:path] ){
-        NSData * data = [NSData dataWithContentsOfFile:path];
+    if( [[NSFileManager defaultManager] fileExistsAtPath:MAP_PATH] ){
+        NSData * data = [NSData dataWithContentsOfFile:MAP_PATH];
         maps = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     }
     return maps;
@@ -42,7 +41,7 @@ VideoMap* gVideoMap = nil;
 
 + (void) saveMaps {
     NSData * data = [NSKeyedArchiver archivedDataWithRootObject:[VideoMap instance].maps];
-    [data writeToFile:filePath(videoFolderPath(),MAPS,EXT_PLIST) atomically:YES];
+    [data writeToFile:MAP_PATH atomically:YES];
 }
 
 - (void) setMaps:(NSMutableArray *)maps {
@@ -83,6 +82,10 @@ VideoMap* gVideoMap = nil;
     [self.maps removeObjectAtIndex:index];
 }
 
+- (void) removeMaps:(NSArray*)maps {
+    [self.maps removeObjectsInArray:maps];
+}
+
 - (void) moveMapFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex {
     NSDictionary* dict = [self.maps objectAtIndex:fromIndex];
     [self.maps removeObjectAtIndex:fromIndex];
@@ -91,6 +94,14 @@ VideoMap* gVideoMap = nil;
     } else {
         [self.maps insertObject:dict atIndex:toIndex];
     }
+}
+
+- (NSDictionary*) mapAtIndex:(NSUInteger)index {
+    NSDictionary* map = nil;
+    if ( [self.maps count] > 0 ) {
+        map = [self.maps objectAtIndex:index];
+    }
+    return map;
 }
 
 #pragma mark - Convenience

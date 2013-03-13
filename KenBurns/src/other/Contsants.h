@@ -21,3 +21,6 @@
 
 #define EXT_MP4                         @"mp4"
 #define EXT_PLIST                       @"plist"
+
+#define RESULT_VIDEO_PATH               filePath(documentFolderPath(),RESULT_VIDEO,EXT_MP4)
+#define MAP_PATH                        filePath(videoFolderPath(),MAPS,EXT_PLIST)

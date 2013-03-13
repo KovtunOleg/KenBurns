@@ -39,6 +39,7 @@
     NSArray* lastAddedMaps = [[VideoMap instance] lastAddedMaps];
     self.imageCounter = [lastAddedMaps count];
     
+    
     if ( self.imageCounter > 0 ) {
         __unsafe_unretained MovieMaker* safePointer = self;
         for ( NSMutableDictionary* map in lastAddedMaps ) {
@@ -49,19 +50,17 @@
                 
                 safePointer.imageCounter--;
                 map[kPath] = path;
+                
                 if ( 0 == safePointer.imageCounter ) {
                     [VideoMap saveMaps];
-                    [safePointer mergeVideos];
-                    [safePointer exportMovieWithCompletionBlock:block path:filePath(documentFolderPath(),RESULT_VIDEO,EXT_MP4)];
+                    [safePointer mergeVideosWithCompletionBlock:block];
                 }
-                
                 
             } path:filePath(videoFolderPath(),image.description,EXT_MP4)];
         }
         
     } else {
-        [self mergeVideos];
-        [self exportMovieWithCompletionBlock:block path:filePath(documentFolderPath(),RESULT_VIDEO,EXT_MP4)];
+        [self mergeVideosWithCompletionBlock:block];
     }
 }
 
@@ -115,29 +114,38 @@
     self.videoComposition.animationTool = animationTool;
 }
 
-- (void) mergeVideos {
+- (void) mergeVideosWithCompletionBlock:(onVideoCreatedBlock)block {
     
     self.composition = [AVMutableComposition composition];
     NSMutableArray* layerInstructions = [NSMutableArray array];
+    NSMutableArray* brokenMaps = [NSMutableArray array];
     CMTime duration = kCMTimeZero;
-    for (NSString* path in [[VideoMap instance] paths] ) {
+    NSArray* paths = [[VideoMap instance] paths];
+    
+    for (NSString* path in paths ) {
         NSURL *urlVideo = [NSURL fileURLWithPath:path];
         AVURLAsset* videoAsset = [[AVURLAsset alloc] initWithURL:urlVideo options:nil];
         
-        AVMutableCompositionTrack *track = [self.composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
-        [track insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAsset.duration) ofTrack:[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:duration error:nil];
-        duration = CMTimeAdd(duration, CMTimeSubtract(videoAsset.duration, CMTimeMake(1, 1)));
-        
-        AVMutableVideoCompositionLayerInstruction * layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:track];
-        [layerInstruction setOpacityRampFromStartOpacity:1.0f toEndOpacity:0.0f timeRange:CMTimeRangeMake(duration, CMTimeMake(1, 1))];
-        [layerInstructions addObject:layerInstruction];
+        if ( [videoAsset tracksWithMediaType:AVMediaTypeVideo].count > 0 ) {
+            AVMutableCompositionTrack *track = [self.composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+            [track insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAsset.duration) ofTrack:[videoAsset tracksWithMediaType:AVMediaTypeVideo][0] atTime:duration error:nil];
+            duration = CMTimeAdd(duration, CMTimeSubtract(videoAsset.duration, CMTimeMake(1, 1)));
+            
+            AVMutableVideoCompositionLayerInstruction * layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:track];
+            [layerInstruction setOpacityRampFromStartOpacity:1.0f toEndOpacity:0.0f timeRange:CMTimeRangeMake(duration, CMTimeMake(1, 1))];
+            [layerInstructions addObject:layerInstruction];
+        } else {
+            [brokenMaps addObject:[[VideoMap instance] mapAtIndex:[paths indexOfObject:path]]];
+        }
     }
+    [self checkBrokenMaps:brokenMaps];
     
     AVMutableVideoCompositionInstruction * instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
     instruction.timeRange = CMTimeRangeMake(kCMTimeZero, self.composition.duration);
     instruction.layerInstructions = layerInstructions;
     
     [self updateVideoCompositionWith:instruction animationTool:nil];
+    [self exportMovieWithCompletionBlock:block path:RESULT_VIDEO_PATH];
 }
 
 #pragma mark - Directory manipulations
@@ -164,6 +172,17 @@
                                   withIntermediateDirectories:YES
                                                    attributes:nil
                                                         error:nil];
+    }
+}
+
+#pragma mark - UIAlertView
+
+- (void) checkBrokenMaps:(NSArray*)brokenMaps {
+    if ( [brokenMaps count] > 0 ) {
+        [[VideoMap instance] removeMaps:brokenMaps];
+        
+        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Some of images are failed to render. Try to re add them." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alertView show];
     }
 }
 

@@ -25,10 +25,11 @@
 - (void) updateWithVideoMap:(VideoMap*)videoMap;
 - (void) addMapWithImage:(UIImage*)image info:(NSString*)info;
 
-
 - (void) addPath:(NSString*)path atIndex:(NSUInteger)index;
 - (void) removeMapAtIndex:(NSUInteger)index;
+- (void) removeMaps:(NSArray*)maps;
 - (void) moveMapFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex;
+- (NSDictionary*) mapAtIndex:(NSUInteger)index;
 
 - (NSArray*) images;
 - (NSArray*) paths;
