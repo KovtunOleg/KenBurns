@@ -23,6 +23,8 @@
     self = [super initWithStyle:style];
     if (self) {
         self.title = @"Edit";
+        self.tableView.backgroundView = nil;
+        [self.tableView setBackgroundColor:[UIColor scrollViewTexturedBackgroundColor]];
         self.tempVideoMap = [VideoMap instance];
         [self setupNavigationButtons];
         self.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;

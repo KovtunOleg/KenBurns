@@ -26,6 +26,7 @@
 - (void) viewDidLoad {
     [super viewDidLoad];
     self.title = @"Result Movie";
+    [self.view setBackgroundColor:[UIColor scrollViewTexturedBackgroundColor]];
     [self setupNavigationButtons];
     [self setupVideoPlayer];
     [self setupMovieMaker];
