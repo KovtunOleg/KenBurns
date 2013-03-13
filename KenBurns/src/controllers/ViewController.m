@@ -75,15 +75,13 @@
 }
 
 - (void) saveButtonAction {
-    NSURL *url = self.videoPlayer.contentURL;
-    UISaveVideoAtPathToSavedPhotosAlbum(url.absoluteString,self,@selector(video:didFinishSavingWithError:contextInfo:),nil);
+    UISaveVideoAtPathToSavedPhotosAlbum(RESULT_VIDEO_PATH,self,@selector(video:didFinishSavingWithError:contextInfo:),nil);
 }
 
 #pragma mark - Setups
 
 - (void) setupMovieMaker {
     self.mMaker = [[MovieMaker alloc] init];
-    [self.mMaker setFrameSize:__iPhone?CGSizeMake(640, 360):CGSizeMake(1280, 720)];
     [self.mMaker setImageDuration:5];
 }
 
@@ -139,11 +137,11 @@
 #pragma mark - Video saving delegate
 
 - (void) video:(NSString *)videoPath didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
-    if ( !error ) {
-        NSLog(@"Video saved to album!");
-    } else {
-        NSLog(@"%@",error.description);
-    }
+    UIAlertView* alertView = [[UIAlertView alloc] init];
+    alertView.title = error ? @"Error" : @"Success";
+    alertView.message = error ? error.description : @"Video saved to album!";
+    [alertView addButtonWithTitle:@"OK"];
+    [alertView show];
 }
 
 @end

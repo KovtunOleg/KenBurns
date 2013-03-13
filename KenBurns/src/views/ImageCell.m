@@ -18,12 +18,12 @@
     return (ImageCell*)objectFromNibForClass(@"ImageCell",[self class]);
 }
 
-- (void) setImageVideo:(UIImage *)image {
-    [self.pictureView setImage:image];
-}
-
 + (CGFloat) height {
     return 150.0f;
+}
+
+- (void) setImageVideo:(UIImage *)image {
+    [self.pictureView setImage:image];
 }
 
 @end

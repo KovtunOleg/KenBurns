@@ -8,8 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ImageCell : UITableViewCell
+@interface ImageCell : UITableViewCell {
+    
+}
+
 + (ImageCell*) imageCell;
-- (void) setImageVideo:(UIImage *)image;
 + (CGFloat) height;
+
+- (void) setImageVideo:(UIImage *)image;
 @end

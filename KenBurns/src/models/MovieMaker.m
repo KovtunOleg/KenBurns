@@ -16,6 +16,8 @@
 @interface MovieMaker ()
 @property (nonatomic,strong) AVMutableComposition* composition;
 @property (nonatomic,strong) AVMutableVideoComposition* videoComposition;
+@property (nonatomic,assign) CGSize frameSize;
+@property (nonatomic,strong) NSString* presetName;
 @property (nonatomic,assign) NSUInteger imageCounter;
 @end
 
@@ -24,7 +26,8 @@
 - (id) init {
     self = [super init];
     if ( self ) {
-        self.frameSize = CGSizeMake(640, 360); // default video frame size
+        self.presetName = [[AVAssetExportSession allExportPresets] containsObject:AVAssetExportPreset1280x720] ? AVAssetExportPreset1280x720 : AVAssetExportPreset640x480;
+        self.frameSize =  [self.presetName isEqualToString:AVAssetExportPreset1280x720] ? CGSizeMake(1280, 720) : CGSizeMake(640, 480);
         self.imageDuration = 5; // default image duration
         [self createVideosFolder];
     }
@@ -92,10 +95,11 @@
 -(void) exportMovieWithCompletionBlock:(onVideoCreatedBlock)block path:(NSString*)path {
     [self removeFile:path];
     
-    __block AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:self.composition presetName:AVAssetExportPresetHighestQuality];
+    __block AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:self.composition presetName:self.presetName];
     exporter.outputURL = [NSURL fileURLWithPath:path];
     exporter.videoComposition = self.videoComposition;
     exporter.outputFileType = AVFileTypeQuickTimeMovie;
+    exporter.shouldOptimizeForNetworkUse = YES;
     [exporter exportAsynchronouslyWithCompletionHandler:^{
         if ( block ) {
             dispatch_async(dispatch_get_main_queue(), ^{
