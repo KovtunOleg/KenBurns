@@ -29,8 +29,8 @@
     [self.view setBackgroundColor:[UIColor scrollViewTexturedBackgroundColor]];
     [self setupNavigationButtons];
     [self setupVideoPlayer];
-    [self setupMovieMaker];
     [self setupProgressHUD];
+    [self setupMovieMaker];
 }
 
 - (void) viewDidAppear:(BOOL)animated {
@@ -82,6 +82,12 @@
 
 - (void) setupMovieMaker {
     self.mMaker = [[MovieMaker alloc] init];
+    __unsafe_unretained ViewController* safePointer = self;
+    [self.mMaker setOnProgressUpdateBlock:^(CGFloat progress, kProgressStatus status) {
+        safePointer.progressHUD.progress = progress;
+        [safePointer.progressHUD setMode:(status == kProgressStatus_Processing)?MBProgressHUDModeDeterminate:MBProgressHUDModeIndeterminate];
+        [safePointer.progressHUD setLabelText:(status == kProgressStatus_Processing)?@"Processing new images...":@"Merge videos..."];
+    }];
     [self.mMaker setImageDuration:5];
 }
 
@@ -95,7 +101,6 @@
 - (void) setupProgressHUD {
     self.progressHUD = [[MBProgressHUD alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
     self.progressHUD.autoresizingMask = self.videoPlayer.view.autoresizingMask;
-    [self.progressHUD setLabelText:@"Processing video..."];
     [self.view addSubview:self.progressHUD];
 }
 

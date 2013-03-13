@@ -41,7 +41,7 @@
     
     NSArray* lastAddedMaps = [[VideoMap instance] lastAddedMaps];
     self.imageCounter = [lastAddedMaps count];
-    
+    [self updateProgress:0 status:kProgressStatus_Processing];
     
     if ( self.imageCounter > 0 ) {
         __unsafe_unretained MovieMaker* safePointer = self;
@@ -53,6 +53,7 @@
                 
                 safePointer.imageCounter--;
                 map[kPath] = path;
+                [self updateProgress:(float)(lastAddedMaps.count-safePointer.imageCounter)/lastAddedMaps.count status:kProgressStatus_Processing];
                 
                 if ( 0 == safePointer.imageCounter ) {
                     [safePointer mergeVideosWithCompletionBlock:block];
@@ -118,6 +119,7 @@
 }
 
 - (void) mergeVideosWithCompletionBlock:(onVideoCreatedBlock)block {
+    [self updateProgress:0 status:kProgressStatus_Merging];
     
     self.composition = [AVMutableComposition composition];
     NSMutableArray* layerInstructions = [NSMutableArray array];
@@ -149,6 +151,12 @@
     
     [self updateVideoCompositionWith:instruction animationTool:nil];
     [self exportMovieWithCompletionBlock:block path:RESULT_VIDEO_PATH];
+}
+
+- (void) updateProgress:(CGFloat)progress status:(kProgressStatus)status {
+    if ( self.onProgressUpdateBlock ) {
+        self.onProgressUpdateBlock(progress,status);
+    }
 }
 
 #pragma mark - Directory manipulations
